@@ -1,0 +1,43 @@
+2025-11-20T16:51:29.266110 | page=Home | df_rows=0
+2025-11-20T16:52:06.095150 | page=Home | df_rows=1000
+2025-11-20T16:52:15.683634 | page=Dashboard | df_rows=1000
+2025-11-20T16:52:26.506528 | page=Dashboard | df_rows=1000
+2025-11-20T16:52:30.406000 | page=Dashboard | df_rows=1000
+2025-11-20T16:52:33.071012 | page=Dashboard | df_rows=1000
+2025-11-20T16:52:37.046899 | page=Dashboard | df_rows=1000
+2025-11-20T16:52:40.584771 | page=Dashboard | df_rows=1000
+2025-11-20T16:53:04.387911 | page=Data Explorer | df_rows=1000
+2025-11-20T16:53:17.243796 | page=AI Assistant | df_rows=1000
+2025-11-20T16:53:41.720070 | page=AI Assistant | df_rows=1000
+2025-11-20T16:53:44.234377 | page=AI Assistant | df_rows=1000
+2025-11-20T16:54:02.772293 | page=AI Assistant | df_rows=1000
+2025-11-20T16:54:21.385575 | page=AI Assistant | df_rows=1000
+2025-11-20T16:54:31.384046 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:38.041891 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:40.813303 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:45.105773 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:47.719106 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:50.439944 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:52.291406 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:54.920341 | page=Insights & Alerts | df_rows=1000
+2025-11-20T16:54:57.574914 | page=Insights & Alerts | df_rows=1000
+2025-11-20T19:45:04.626800 | page=Home | df_rows=0
+2025-11-20T19:45:22.244624 | page=Home | df_rows=50000
+2025-11-20T19:50:26.201929 | page=Dashboard | df_rows=50000
+2025-11-20T19:50:57.515707 | page=Dashboard | df_rows=50000
+2025-11-20T19:51:06.328998 | page=Dashboard | df_rows=50000
+2025-11-20T19:51:35.411231 | page=AI Assistant | df_rows=50000
+2025-11-20T19:52:12.485013 | page=AI Assistant | df_rows=50000
+2025-11-20T19:52:20.776991 | page=Insights & Alerts | df_rows=50000
+2025-11-20T19:53:12.300161 | page=ML Models | df_rows=50000
+2025-11-20T19:53:21.749167 | page=ML Models | df_rows=50000
+2025-11-20T19:53:31.676367 | page=ML Models | df_rows=50000
+2025-11-20T19:53:37.779231 | page=ML Models | df_rows=50000
+2025-11-20T19:53:38.889887 | page=ML Models | df_rows=50000
+2025-11-20T19:53:40.107520 | page=ML Models | df_rows=50000
+2025-11-20T19:53:47.533534 | page=ML Models | df_rows=50000
+2025-11-20T19:53:51.511864 | page=ML Models | df_rows=50000
+2025-11-20T19:53:58.295003 | page=ML Models | df_rows=50000
+2025-11-20T19:54:02.727936 | page=ML Models | df_rows=50000
+2025-11-20T19:54:17.256705 | page=Data Explorer | df_rows=50000
+2025-11-20T20:00:29.956262 | page=Home | df_rows=50000
