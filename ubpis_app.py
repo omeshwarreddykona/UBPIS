@@ -168,7 +168,6 @@ if st.sidebar.button("Clear dataset & cache"):
     except Exception:
         pass
     st.sidebar.success("Dataset and cache cleared")
-
 # -----------------------------
 # Require dataset decorator
 # -----------------------------
