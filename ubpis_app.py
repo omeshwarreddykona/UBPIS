@@ -1,16 +1,14 @@
-
 """
 UBPIS — Universal Business & Predictive Insights System
 Author: Kona Omeshwar Reddy
 Preferred Name: Omeshwar Reddy Kona
-Version: 1.0
+Version: 1.1
 License: MIT
 
 Notes:
-- Keeps original app structure and pages (Home, Data Explorer, Dashboard, ML Predictions, Anomalies, AI Assistant, Settings).
-- Hardened dashboard visualization section to auto-detect columns and avoid ValueError/NameError.
-- Works with arbitrary uploaded datasets — no requirement for 'product' / 'region' / 'order_date' column names.
-- Minimal, non-invasive changes: only the visualization/charting logic and safe guards.
+- Upload-first app. No demo or sample datasets.
+- Works with arbitrary uploaded datasets — no required column names.
+- Large datasets handled safely with preview limits.
 """
 
 # -----------------------------
@@ -20,15 +18,13 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from datetime import datetime, timedelta
-import io, os, warnings
+from datetime import datetime
+import io, warnings
 warnings.filterwarnings("ignore")
 
 import plotly.express as px
 import plotly.graph_objects as go
-
 from sklearn.ensemble import RandomForestRegressor, IsolationForest
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import RandomizedSearchCV
 
 # Optional OpenAI
@@ -148,11 +144,23 @@ st.sidebar.title("Navigation")
 page = st.sidebar.radio("", ("Home","Data Explorer","Dashboard","ML Predictions","Anomalies","AI Assistant","Settings"))
 st.sidebar.markdown("---")
 st.sidebar.title("Data & Controls")
+
 uploaded_file = st.sidebar.file_uploader("Upload CSV / XLSX", type=["csv","xlsx"])
-load_sample = st.sidebar.checkbox("Load sample dataset", value=True)
+
+if uploaded_file is not None:
+    try:
+        if uploaded_file.name.lower().endswith(".csv"):
+            st.session_state.df = pd.read_csv(uploaded_file)
+        else:
+            st.session_state.df = pd.read_excel(uploaded_file, engine="openpyxl")
+        st.sidebar.success(f"Loaded {uploaded_file.name}")
+    except Exception as e:
+        st.sidebar.error(f"Failed to read file: {e}")
+
 openai_key_input = st.sidebar.text_input("OpenAI API key (optional)", type="password")
 if openai_key_input:
     st.session_state.openai_key = openai_key_input
+
 if st.sidebar.button("Clear dataset & cache"):
     clear_dataset()
     try:
@@ -162,68 +170,12 @@ if st.sidebar.button("Clear dataset & cache"):
     st.sidebar.success("Dataset and cache cleared")
 
 # -----------------------------
-# Demo dataset
+# Require dataset decorator
 # -----------------------------
-def generate_indian_sales_demo(n_days=180, n_customers=300, seed=42):
-    np.random.seed(seed)
-    first_names = ["Aarav","Vivaan","Aditya","Vihaan","Arjun","Sai","Rohan","Rahul","Karthik","Siddharth",
-                   "Ananya","Priya","Sakshi","Neha","Aishwarya","Pooja"]
-    last_names = ["Sharma","Reddy","Kumar","Singh","Patel","Gupta","Mehta","Iyer","Nair","Joshi"]
-    products = ["Alpha","Beta","Gamma","Delta","Epsilon"]
-    regions = ["North","South","East","West","Central"]
-    customers = [f"{np.random.choice(first_names)} {np.random.choice(last_names)}" for _ in range(n_customers)]
-    start = pd.Timestamp.today() - pd.Timedelta(days=n_days)
-    rows = []
-    for day in range(n_days):
-        date = (start + pd.Timedelta(days=day)).date()
-        orders = np.random.poisson(20)
-        for _ in range(orders):
-            customer = np.random.choice(customers)
-            product = np.random.choice(products, p=[0.25,0.25,0.2,0.2,0.1])
-            units = max(1,int(np.random.poisson(3)))
-            unit_price = round(np.random.uniform(50,2000)*(1+(np.random.rand()-0.5)*0.2),2)
-            revenue = round(units*unit_price,2)
-            cost = round(revenue*np.random.uniform(0.5,0.85),2)
-            profit = round(revenue-cost,2)
-            region = np.random.choice(regions)
-            rows.append({"order_date":date,"customer":customer,"region":region,"product":product,
-                         "units_sold":units,"unit_price":unit_price,"revenue":revenue,"cost":cost,"profit":profit})
-    return pd.DataFrame(rows)
-
-if st.sidebar.button("Generate & Save Indian Sales Demo (CSV + Excel)"):
-    demo = generate_indian_sales_demo()
-    path_csv = OUTPUTS_DIR/"sales_demo_india.csv"
-    path_xlsx = OUTPUTS_DIR/"sales_demo_india.xlsx"
-    demo.to_csv(path_csv,index=False)
-    try:
-        demo.to_excel(path_xlsx,index=False,engine="openpyxl")
-    except Exception:
-        pass
-    st.sidebar.success(f"Demo saved: {path_csv} & {path_xlsx}")
-
-# -----------------------------
-# Load dataset
-# -----------------------------
-@st.cache_data
-def load_demo():
-    return generate_indian_sales_demo()
-
-if uploaded_file is not None:
-    try:
-        if uploaded_file.name.lower().endswith(".csv"):
-            st.session_state.df = pd.read_csv(uploaded_file)
-        else:
-            st.session_state.df = pd.read_excel(uploaded_file, engine="openpyxl")
-        st.sidebar.success("File loaded into session")
-    except Exception as e:
-        st.sidebar.error(f"Failed to read file: {e}")
-elif load_sample and st.session_state.df is None:
-    st.session_state.df = load_demo()
-
-def require_data(show_message=True):
+def require_data():
     if st.session_state.df is None:
-        if show_message: st.info("No data loaded. Upload or enable 'Load sample dataset' in sidebar.")
-        return False
+        st.info("Please upload a CSV or Excel file to proceed.")
+        st.stop()
     return True
 
 # -----------------------------
@@ -233,7 +185,7 @@ def require_data(show_message=True):
 # --- HOME ---
 if page=="Home":
     st.header("Universal Business & Prediction Insight System — Home")
-    if not require_data(): st.stop()
+    require_data()
     df = st.session_state.df
     info = summarize_df(df)
     c1,c2,c3,c4 = st.columns(4)
@@ -242,26 +194,16 @@ if page=="Home":
     c3.metric("Missing",info["missing"])
     c4.metric("Memory (MB)",info["memory_mb"])
     st.markdown("---")
-    st.subheader("Quick KPIs")
-    money_cols = [c for c in df.columns if detect_currency_like(c)]
-    total_revenue = df[money_cols[0]].sum() if money_cols else 0
-    total_profit = df["profit"].sum() if "profit" in df.columns else 0
-    avg_order = (total_revenue/df["units_sold"].sum()) if ("units_sold" in df.columns and money_cols) else 0
-    k1,k2,k3 = st.columns(3)
-    k1.metric("Total Revenue",format_currency(total_revenue))
-    k2.metric("Total Profit",format_currency(total_profit))
-    k3.metric("Avg Order Value",format_currency(avg_order))
-    st.markdown("---")
     st.subheader("Preview sample rows")
-    st.dataframe(df.head(50),use_container_width=True)
+    st.dataframe(df.head(50), use_container_width=True)
 
 # --- DATA EXPLORER ---
 elif page=="Data Explorer":
     st.header("Data Explorer")
-    if not require_data(): st.stop()
+    require_data()
     df = st.session_state.df
     st.subheader("Preview & Schema")
-    st.dataframe(df.head(200),use_container_width=True)
+    st.dataframe(df.head(200), use_container_width=True)
     with st.expander("Column types & null counts"):
         st.write(pd.DataFrame({"dtype":df.dtypes.astype(str),"nulls":df.isnull().sum()}))
     with st.expander("Summary statistics"):
@@ -276,7 +218,6 @@ elif page=="Data Explorer":
         st.download_button("Download Excel",buf_xlsx.getvalue(),file_name="dataset.xlsx")
     except Exception:
         pass
-
 # --- DASHBOARD (FLEXIBLE) ---
 elif page=="Dashboard":
     st.header("Dashboard — Flexible Visual Builder")

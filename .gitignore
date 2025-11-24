@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+*.log
+*.ipynb_checkpoints/
+
+# Jupyter Notebooks
+*.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# Anaconda
+.conda/
+.condarc
+.Continuum/
+
+# Arduino / system files
+AppData/
+*.tmp
+*.bak
+*.old
+
+# Node / JS
+node_modules/
+package-lock.json
+
+# Others
+*.DS_Store
